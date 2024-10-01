@@ -1,1 +1,2 @@
 # Guillaume-Bodson
+README edits
