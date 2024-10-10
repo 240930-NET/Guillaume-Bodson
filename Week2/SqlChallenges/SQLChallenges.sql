@@ -45,23 +45,69 @@ Order BY sales DESC;
 
 -- JOINS CHALLENGES
 -- Every Album by Artist
+SELECT Album.Title, Artist.Name 
+FROM Album INNER JOIN Artist
+ON Album.ArtistId = Artist.ArtistId
 
 -- All songs of the rock genre
+SELECT Track.Name
+FROM Track INNER JOIN Genre
+ON Track.GenreId = Genre.GenreId
+WHERE Genre.Name = 'Rock'
 
 -- Show all invoices of customers from brazil (mailing address not billing)
+Select * 
+FROM Invoice INNER JOIN Customer
+ON Invoice.CustomerId = Customer.CustomerId
+WHERE Customer.Country = 'Brazil'
 
 -- Show all invoices together with the name of the sales agent for each one
+SELECT Invoice.*, CONCAT(Employee.FirstName, ' ', Employee.LastName) AS SalesAgentName
+FROM Invoice 
+INNER JOIN Customer ON Invoice.CustomerId = Customer.CustomerId
+INNER JOIN Employee ON Customer.SupportRepId = Employee.EmployeeId
 
 -- Which sales agent made the most sales in 2009?
+SELECT TOP 1 COUNT(Employee.EmployeeId) as SalesCount, CONCAT(Employee.FirstName, ' ', Employee.LastName) AS SalesAgentName 
+FROM Invoice 
+INNER JOIN Customer ON Invoice.CustomerId = Customer.CustomerId
+INNER JOIN Employee ON Customer.SupportRepId = Employee.EmployeeId
+WHERE YEAR(Invoice.InvoiceDate) = 2009
+GROUP BY CONCAT(Employee.FirstName, ' ', Employee.LastName)
+ORDER BY SalesCount DESC
 
 -- How many customers are assigned to each sales agent?
+SELECT COUNT(Customer.CustomerId) as CustomerNumber, CONCAT(Employee.FirstName, ' ', Employee.LastName) AS SalesAgentName 
+FROM Employee
+INNER JOIN Customer ON Employee.EmployeeId = Customer.SupportRepId
+GROUP BY CONCAT(Employee.FirstName, ' ', Employee.LastName)
 
 -- Which track was purchased the most ing 20010?
+SELECT TOP 1 Track.Name
+FROM Track 
+INNER JOIN InvoiceLine ON InvoiceLine.TrackId = Track.TrackId
+INNER JOIN Invoice ON InvoiceLine.InvoiceId = Invoice.InvoiceId
+WHERE YEAR(Invoice.InvoiceDate) = 2010
+GROUP BY Track.Name
+ORDER BY SUM(InvoiceLine.Quantity) DESC
 
 -- Show the top three best selling artists.
+SELECT TOP 3 Artist.Name
+FROM Artist
+INNER JOIN Album ON Artist.ArtistId = Album.ArtistId
+INNER JOIN Track ON Album.AlbumId = Track.AlbumId
+INNER JOIN InvoiceLine ON InvoiceLine.TrackId = Track.TrackId
+GROUP BY Artist.Name
+ORDER BY SUM(InvoiceLine.Quantity) DESC
 
 -- Which customers have the same initials as at least one other customer?
-
+SELECT CONCAT(customer1.FirstName, ' ', customer1.LastName) AS CustomerFullName
+FROM Customer AS customer1
+INNER JOIN Customer AS customer2 
+ON UPPER(LEFT(customer1.FirstName, 1)) = UPPER(LEFT(customer2.FirstName, 1)) 
+AND UPPER(LEFT(customer1.LastName, 1)) = UPPER(LEFT(customer2.LastName, 1))
+AND customer1.CustomerId != customer2.CustomerId
+ORDER BY CustomerFullName
 
 
 -- ADVACED CHALLENGES
